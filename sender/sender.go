@@ -34,8 +34,8 @@ const (
 	PKT_SIZE = 16
 )
 
-func send(id int, conn net.Conn, resChannel chan<-SentInfo) {
-	b := make([]byte, PKT_SIZE)
+func send(id int, conn net.Conn, resChannel chan<-SentInfo, packetSize int) {
+	b := make([]byte, packetSize)
 	binary.BigEndian.PutUint16(b[0:], uint16(len(b) - 2))
 	binary.BigEndian.PutUint32(b[2:], uint32(id))
 	sentInfo := SentInfo{id, time.Now()}
@@ -75,7 +75,7 @@ func buildResult(sent []SentInfo, recv []RecvInfo) result.Result {
 	return result.Result{items}
 }
 
-func Run(dest string, msgs int, delay time.Duration) (*result.Result, error) {
+func Run(dest string, msgs int, delay time.Duration, packetSize int) (*result.Result, error) {
 	conn, err := net.Dial("tcp", dest)
 	if err != nil {
 		fmt.Println("Failed to connect")
@@ -96,7 +96,7 @@ func Run(dest string, msgs int, delay time.Duration) (*result.Result, error) {
 	for sentMsg < msgs {
 		select {
 		case <- tick:
-			go send(len(sent), conn, sentChan)
+			go send(len(sent), conn, sentChan, packetSize)
 			sentMsg += 1
 		case info := <-sentChan:
 			sent = append(sent, info)
