@@ -1,23 +1,29 @@
 package main
 
 import (
+	"encoding/binary"
 	"io"
 	"fmt"
 	"net"
 )
 
 func handleRequests(conn net.Conn) {
-	b := make([]byte, 16)
+	hdr := make([]byte, 2)
 	for {
-		l, err := conn.Read(b)
+		l, err := conn.Read(hdr)
 		if err == io.EOF {
 			conn.Close()
 			return
 		}
+		if l != 2 || err != nil {
+			panic(fmt.Sprintf("%v %v", l, err))
+		}
+		b := make([]byte, binary.BigEndian.Uint16(hdr))
+		l, err = conn.Read(b)
 		if l != len(b) || err != nil {
 			panic(fmt.Sprintf("%v %v", l, err))
 		}
-		conn.Write(b)
+		conn.Write(append(hdr, b...))
 	}
 }
 
