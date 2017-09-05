@@ -34,10 +34,16 @@ func avg(items []Item) int64 {
 	return sum/int64(len(items))
 }
 
-func PrintResult(result Result) {
+func PrintSummary(result Result) {
 	minVal := min(result.Items)
 	maxVal := max(result.Items)
 	avgVal := avg(result.Items)
 
 	fmt.Printf("AVG(%vns) MIN(%vns) MAX(%vns)\n", avgVal, minVal, maxVal)
+}
+
+func PrintCSV(pktSize int, result Result) {
+	for _, item := range result.Items {
+		fmt.Printf("%v,%v,%v\n", pktSize, item.Message, item.Roundtrip)
+	}
 }
