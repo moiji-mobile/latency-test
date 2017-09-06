@@ -30,10 +30,6 @@ func (a ByRecvPkt) Len() int { return len(a) }
 func (a ByRecvPkt) Swap(i int, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByRecvPkt) Less(i int, j int) bool { return a[i].pkt < a[j].pkt }
 
-const (
-	PKT_SIZE = 16
-)
-
 func send(id int, conn net.Conn, resChannel chan<-SentInfo, packetSize int) {
 	b := make([]byte, packetSize)
 	binary.BigEndian.PutUint16(b[0:], uint16(len(b) - 2))
@@ -43,11 +39,11 @@ func send(id int, conn net.Conn, resChannel chan<-SentInfo, packetSize int) {
 	resChannel <- sentInfo
 }
 
-func recvAll(total int, conn net.Conn, resChannel chan<-RecvInfo) {
-	b := make([]byte, PKT_SIZE)
+func recvAll(total int, conn net.Conn, resChannel chan<-RecvInfo, packetSize int) {
+	b := make([]byte, packetSize)
 	for i := 0; i < total; i++ {
 		l, err := conn.Read(b)
-		if l != PKT_SIZE {
+		if l != packetSize {
 			panic(fmt.Sprintf("Short read.. %v %v", l, err))
 		}
 		now := time.Now()
@@ -90,7 +86,7 @@ func Run(dest string, msgs int, delay time.Duration, packetSize int) (*result.Re
 	tick := time.Tick(delay)
 
 	// Start a receiver...
-	go recvAll(msgs, conn, recvChan)
+	go recvAll(msgs, conn, recvChan, packetSize)
 
 	// Sent and fetch whatever is there
 	for sentMsg < msgs {
