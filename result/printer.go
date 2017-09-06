@@ -2,6 +2,7 @@ package result
 
 import (
 	"fmt"
+	"os"
 )
 
 func min(items []Item) int64 {
@@ -42,8 +43,14 @@ func PrintSummary(result Result) {
 	fmt.Printf("AVG(%vns) MIN(%vns) MAX(%vns)\n", avgVal, minVal, maxVal)
 }
 
-func PrintCSV(pktSize int, result Result) {
+func PrintCSV(pktSize int, result Result, dest string) {
+	file, err := os.Create(dest)
+	if err != nil {
+		panic("Can't open the result file")
+	}
+	defer file.Close()
+
 	for _, item := range result.Items {
-		fmt.Printf("%v,%v,%v\n", pktSize, item.Message, item.Roundtrip)
+		fmt.Fprintf(file, "%v,%v,%v\n", pktSize, item.Message, item.Roundtrip)
 	}
 }

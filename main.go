@@ -13,7 +13,7 @@ func main() {
 	msgsFlag := flag.Int("messages", 5000, "Number of messages to send")
 	timeFlag := flag.Duration("interval", 500*time.Millisecond, "Wait between messages")
 	pktsFlag := flag.Int("packet-size", 16, "Bytes to send")
-	detaFlag := flag.Bool("print-all", false, "Print a CSV result")
+	detaFlag := flag.String("write-result", "", "Print a CSV result to file")
 	flag.Parse()
 
 	if (*pktsFlag < 2) {
@@ -26,9 +26,8 @@ func main() {
 		return
 	}
 
-	if (*detaFlag) {
-		result.PrintCSV(*pktsFlag, *runResult)
-	} else {
-		result.PrintSummary(*runResult)
+	result.PrintSummary(*runResult)
+	if len(*detaFlag) > 0 {
+		result.PrintCSV(*pktsFlag, *runResult, *detaFlag)
 	}
 }
