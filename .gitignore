@@ -2,3 +2,4 @@ latency-test
 contrib/contrib
 contrib/server
 *.sw?
+result_*.csv
