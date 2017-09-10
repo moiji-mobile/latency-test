@@ -16,12 +16,12 @@ func handleRequests(conn net.Conn) {
 			return
 		}
 		if l != 2 || err != nil {
-			panic(fmt.Sprintf("%v %v", l, err))
+			panic(fmt.Sprintf("S: %v %v", l, err))
 		}
 		b := make([]byte, binary.BigEndian.Uint16(hdr))
 		l, err = conn.Read(b)
 		if l != len(b) || err != nil {
-			panic(fmt.Sprintf("%v %v", l, err))
+			panic(fmt.Sprintf("S: %v %v", l, err))
 		}
 		conn.Write(append(hdr, b...))
 	}
@@ -30,7 +30,7 @@ func handleRequests(conn net.Conn) {
 func main() {
 	serverSock, err := net.Listen("tcp", "localhost:7999")
 	if err != nil {
-		panic(fmt.Sprintf("%v", err))
+		panic(fmt.Sprintf("S: %v", err))
 	}
 	defer serverSock.Close()
 
